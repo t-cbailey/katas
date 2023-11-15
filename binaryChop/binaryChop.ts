@@ -39,3 +39,5 @@ export function binaryChop(int: number, arr: number[]) {
 //   }
 //   return -1;
 // }
+
+//** Version 3 **/
