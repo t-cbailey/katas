@@ -2,27 +2,42 @@ const fs = require("fs");
 const fsPromises = require("fs").promises;
 
 async function displayWeatherData() {
-  const fetchData = async () => {
-    return fsPromises.readFile("./weather.dat", "utf-8");
-  };
+  const data = await fsPromises.readFile("./weather.dat", "utf-8");
 
-  const data = await fetchData();
+  let splitData = [];
 
-  const formattedData = data
-    .replace(/\s+/g, " ")
-    .split(" ")
-    .filter((item) => {
-      if (item && item !== " ") return item;
-    });
+  let i = 91;
 
-  const dayData = [];
-
-  for (let j = 1; j < 10; j++) {
-    const location = formattedData.indexOf(j.toString());
-    dayData.push(formattedData.slice(location, location + 3));
+  while (i < data.length - 90) {
+    const sliced = data.slice(i, i + 20);
+    splitData.push([sliced]);
+    i += 90;
   }
 
-  return dayData;
+  splitData = splitData.map((day) => {
+    return day[0]
+      .replace(/\s+/g, " ")
+      .split(" ")
+      .filter((item) => {
+        if (item && item !== " ") return item;
+      });
+  });
+
+  console.log(splitData);
+
+  const smallestDelta = [0, null];
+
+  splitData.forEach((day) => {
+    const delta = day[1] - day[2];
+    if (delta < smallestDelta[1] || smallestDelta[1] === null) {
+      smallestDelta[0] = day[0];
+      smallestDelta[1] = delta;
+    }
+  });
+
+  return smallestDelta;
 }
 
-console.log(displayWeatherData());
+displayWeatherData().then((res) => {
+  console.log(res);
+});
