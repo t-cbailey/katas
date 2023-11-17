@@ -1,12 +1,13 @@
 const fsPromises = require("fs").promises;
 
+////weather variation////
+//Find the smallest diff between high and low temps and return that diff with the day number.
+
 async function displayWeatherData() {
   const data = await fsPromises.readFile("./weather.dat", "utf-8");
-
   let splitData = [];
 
   let i = 91;
-
   while (i < data.length - 90) {
     const sliced = data.slice(i, i + 14);
     splitData.push([sliced]);
@@ -41,7 +42,8 @@ displayWeatherData().then((res) => {
   console.log(res);
 });
 
-//football variation////
+////football variation////
+//Find the smallest diff between goals scored/conceeded and return that diff with the team name.
 
 async function displayFootballData() {
   const data = await fsPromises.readFile("./football.dat", "utf-8");
@@ -76,6 +78,8 @@ displayFootballData().then((res) => {
 });
 
 //D.R.Y version//
+//Combine the two functions above into a DRY function to handle both data sets.
+//Takes a filepath and zero-indexed column numbers to compare.
 
 async function findSmallestDelta(filePath, col1, col2) {
   const data = await fsPromises.readFile(filePath, "utf-8");
@@ -92,8 +96,8 @@ async function findSmallestDelta(filePath, col1, col2) {
 
   splitData.forEach((arr) => {
     if (arr.length > 1) {
-      const high = arr[col1];
-      const low = arr[col2];
+      const high = arr[col1].replaceAll(/[^0-9]/g, "");
+      const low = arr[col2].replaceAll(/[^0-9]/g, "");
       let delta = high - low;
       if (delta < 0) {
         delta = -delta;
