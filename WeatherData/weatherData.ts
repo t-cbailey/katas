@@ -1,4 +1,3 @@
-const fs = require("fs");
 const fsPromises = require("fs").promises;
 
 async function displayWeatherData() {
@@ -39,5 +38,39 @@ async function displayWeatherData() {
 }
 
 displayWeatherData().then((res) => {
+  console.log(res);
+});
+
+//football variation////
+
+async function displayFootballData() {
+  const data = await fsPromises.readFile("./football.dat", "utf-8");
+
+  let splitData = data.split("\n");
+  splitData = splitData
+    .map((team) => {
+      return team.trim().replaceAll(/\s+/g, ",").split(",");
+    })
+    .slice(1, splitData.length);
+
+  const smallestDelta = [0, null];
+
+  splitData.forEach((team) => {
+    const goalsFor = team[6];
+    const goalsAgainst = team[8];
+    let delta = goalsFor - goalsAgainst;
+    if (delta < 0) {
+      delta = -delta;
+    }
+    if (delta < smallestDelta[1] || smallestDelta[1] === null) {
+      smallestDelta[0] = team[1];
+      smallestDelta[1] = delta;
+    }
+  });
+
+  return `The team with the smallest variation in goals for and against is ${smallestDelta[0]} with a delta of ${smallestDelta[1]} goals.`;
+}
+
+displayFootballData().then((res) => {
   console.log(res);
 });
