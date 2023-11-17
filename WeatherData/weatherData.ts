@@ -18,7 +18,7 @@ async function displayWeatherData() {
     return day[0]
       .replace(/\s+/g, " ")
       .split(" ")
-      .filter((item) => {
+      .filter((item: string) => {
         if (item && item !== " ") return item;
       });
   });
@@ -50,22 +50,22 @@ async function displayFootballData() {
 
   let splitData = data.split("\n");
   splitData = splitData
-    .map((team) => {
+    .map((team: string) => {
       return team.trim().replaceAll(/\s+/g, ",").split(",");
     })
     .slice(1, splitData.length);
 
   const smallestDelta = [0, null];
 
-  splitData.forEach((team) => {
+  splitData.forEach((team: string) => {
     const goalsFor = team[6];
     const goalsAgainst = team[8];
-    let delta = goalsFor - goalsAgainst;
+    let delta = +goalsFor - +goalsAgainst;
     if (delta < 0) {
       delta = -delta;
     }
     if (delta < smallestDelta[1] || smallestDelta[1] === null) {
-      smallestDelta[0] = team[1];
+      smallestDelta[0] = +team[1];
       smallestDelta[1] = delta;
     }
   });
@@ -81,30 +81,30 @@ displayFootballData().then((res) => {
 //Combine the two functions above into a DRY function to handle both data sets.
 //Takes a filepath and zero-indexed column numbers to compare.
 
-async function findSmallestDelta(filePath, col1, col2) {
+async function findSmallestDelta(filePath: string, col1: number, col2: number) {
   const data = await fsPromises.readFile(filePath, "utf-8");
   const type = filePath.match(/(?<=\/)\w+/gi).toString();
 
   let splitData = data.split("\n");
   splitData = splitData
-    .map((arr) => {
-      return arr.trim().replaceAll(/\s+/g, ",").split(",");
+    .map((str: string) => {
+      return str.trim().replaceAll(/\s+/g, ",").split(",");
     })
     .slice(1, splitData.length);
 
-  const smallestDelta = [0, null];
+  const smallestDelta = ["0", null];
 
-  splitData.forEach((arr) => {
+  splitData.forEach((arr: string[]) => {
     if (arr.length > 1) {
       const high = arr[col1].replaceAll(/[^0-9]/g, "");
       const low = arr[col2].replaceAll(/[^0-9]/g, "");
-      let delta = high - low;
+      let delta = +high - +low;
       if (delta < 0) {
         delta = -delta;
       }
-      if (delta < smallestDelta[1] || smallestDelta[1] === null) {
+      if (delta < +smallestDelta[1] || smallestDelta[1] === null) {
         smallestDelta[0] = type === "football" ? arr[1] : arr[0];
-        smallestDelta[1] = delta;
+        smallestDelta[1] = `${delta}`;
       }
     }
   });
